@@ -580,6 +580,8 @@ function buscarProductoCompra(codigo) {
 
   if (prod) {
     document.getElementById('c-producto').value = prod.nombre;
+    document.getElementById('c-precio').value = prod.precio || '';
+    calcularTotalesCompra();
     if (el) { el.style.display='block'; el.style.color='var(--verde)'; el.textContent='✅ Producto: ' + prod.nombre; }
   } else {
     if (el) { el.style.display='block'; el.style.color='var(--rojo)'; el.textContent='❌ Código no encontrado: ' + codigo + ' | Productos en cache: ' + productosCache.length; }
@@ -2135,7 +2137,7 @@ window.showPage = function(page) {
                 <label class="form-label">Producto / Servicio *</label>
                 <div style="display:flex; gap:8px;">
                   <input type="text" id="c-producto" class="form-input" placeholder="Nombre del producto o escanea el código" required style="flex:1;">
-                  <input type="text" id="c-codigo-barras" class="form-input" placeholder="Código de barras" style="width:180px;" oninput="buscarProductoCompra(this.value)">
+                  <input type="text" id="c-codigo-barras" class="form-input" placeholder="Código de barras" style="width:180px;" oninput="buscarProductoCompra(this.value)" onchange="buscarProductoCompra(this.value)">
                 </div>
               </div>
               <div class="form-group">
