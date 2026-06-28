@@ -565,12 +565,24 @@ function buscarProveedor(ruc) {
 
 function buscarProductoCompra(codigo) {
   if (!codigo || codigo.length < 3) return;
-  const prod = productosCache.find(p => p.codigoBarras === codigo.trim() || p.codigo === codigo.trim());
+  
+  const el = document.getElementById('scan-resultado-c');
+  
+  if (productosCache.length === 0) {
+    if (el) { el.style.display='block'; el.style.color='var(--rojo)'; el.textContent='⚠️ Cache vacío - cargando productos...'; }
+    cargarProductos().then(() => buscarProductoCompra(codigo));
+    return;
+  }
+
+  const prod = productosCache.find(p => 
+    p.codigoBarras === codigo.trim() || p.codigo === codigo.trim()
+  );
+
   if (prod) {
     document.getElementById('c-producto').value = prod.nombre;
-    document.getElementById('c-scan-resultado') && (document.getElementById('scan-resultado-c').style.display = 'block');
-    const el = document.getElementById('scan-resultado-c');
-    if (el) { el.style.display='block'; el.textContent='✅ Producto: ' + prod.nombre; }
+    if (el) { el.style.display='block'; el.style.color='var(--verde)'; el.textContent='✅ Producto: ' + prod.nombre; }
+  } else {
+    if (el) { el.style.display='block'; el.style.color='var(--rojo)'; el.textContent='❌ Código no encontrado: ' + codigo + ' | Productos en cache: ' + productosCache.length; }
   }
 }
 
