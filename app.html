@@ -1245,7 +1245,7 @@ async function cargarProductosLista() {
         <td>${row[1]||'-'}</td>
         <td>${row[2]||'-'}</td>
         <td>${row[3]||'-'}</td>
-        <td><b>S/. ${parseFloat(row[4]||0).toFixed(2)}</b></td>
+        <td><b>S/. ${parseFloat((row[4]||0).toString().replace(',','.')).toFixed(2)}</b></td>
         <td>${badgeBarras}</td>
         <td>${row[6]||'0'}</td>
       </tr>`;
