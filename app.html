@@ -3352,8 +3352,10 @@ function descargarArchivo(contenido, nombre, tipo) {
             <thead>
               <tr>
                 <th>Nombres</th><th>Mes</th><th>Sueldo</th><th>Asig. Fam.</th>
-                <th>Gratif.</th><th>CTS</th><th>Régimen</th><th>AFP Monto</th>
-                <th>Total Dcto.</th><th>Neto Pagar</th><th>Medio Pago</th><th>Req. Ajuste</th>
+                <th>Gratif.</th><th>Vacaciones</th><th>CTS</th><th>AFP</th><th>AFP Monto</th>
+                <th>5ta Categ.</th><th>ONP</th><th>Total Dcto.</th><th>Neto Pagar</th>
+                <th>EsSalud</th><th>Total Aporte</th><th>Medio Pago</th><th>Régimen</th>
+                <th>Salió Vac.</th><th>Req. Ajuste</th>
               </tr>
             </thead>
             <tbody id="planilla-tbody">
@@ -4684,13 +4686,13 @@ async function cargarPlanilla() {
   const tbody = document.getElementById('planilla-tbody');
   const count = document.getElementById('planilla-count');
   if (!tbody) return;
-  tbody.innerHTML = '<tr><td colspan="12" style="text-align:center; padding:24px;"><div class="loading"><div class="spinner"></div> Cargando...</div></td></tr>';
+  tbody.innerHTML = '<tr><td colspan="19" style="text-align:center; padding:24px;"><div class="loading"><div class="spinner"></div> Cargando...</div></td></tr>';
   try {
     const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/PLANILLA!A2:W500?key=${API_KEY}`;
     const resp = await fetch(url);
     const data = await resp.json();
     if (!data.values || data.values.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="12" style="text-align:center; padding:32px; color:#A0AEC0;">Sin registros de planilla.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="19" style="text-align:center; padding:32px; color:#A0AEC0;">Sin registros de planilla.</td></tr>';
       if (count) count.textContent = '0 registros'; return;
     }
     const rows = data.values;
@@ -4699,22 +4701,31 @@ async function cargarPlanilla() {
       const reqAjuste = (row[18]||'').trim(); // S - REQUIERE AJUSTE
       const badgeAjuste = reqAjuste ? '<span class="badge badge-amarillo">⚠️ Ajuste</span>' : '<span class="badge badge-verde">OK</span>';
       const regimen = (row[21]||'-').trim(); // V - REGIMEN
+      const salioVac = (row[22]||'-').trim(); // W - SALIO DE VACACIONES
       return `<tr>
-        <td>${row[1]||'-'}</td><td>${row[2]||'-'}</td>
+        <td>${row[1]||'-'}</td>
+        <td>${row[2]||'-'}</td>
         <td>S/. ${parseFloat(row[3]||0).toFixed(2)}</td>
         <td>S/. ${parseFloat(row[4]||0).toFixed(2)}</td>
         <td>S/. ${parseFloat(row[5]||0).toFixed(2)}</td>
         <td>S/. ${parseFloat(row[6]||0).toFixed(2)}</td>
-        <td>${regimen}</td>
         <td>S/. ${parseFloat(row[9]||0).toFixed(2)}</td>
-        <td>S/. ${parseFloat(row[13]||0).toFixed(2)}</td>
+        <td>${row[7]||'-'}</td>
+        <td>S/. ${parseFloat(row[8]||0).toFixed(2)}</td>
+        <td>S/. ${parseFloat(row[10]||0).toFixed(2)}</td>
+        <td>S/. ${parseFloat(row[11]||0).toFixed(2)}</td>
+        <td>S/. ${parseFloat(row[12]||0).toFixed(2)}</td>
+        <td><b>S/. ${parseFloat(row[13]||0).toFixed(2)}</b></td>
         <td>S/. ${parseFloat(row[14]||0).toFixed(2)}</td>
+        <td>S/. ${parseFloat(row[15]||0).toFixed(2)}</td>
         <td>${row[16]||'-'}</td>
+        <td>${regimen}</td>
+        <td>${salioVac}</td>
         <td>${badgeAjuste}</td>
       </tr>`;
     }).join('');
   } catch(err) {
-    tbody.innerHTML = '<tr><td colspan="12" style="text-align:center; padding:32px; color:var(--rojo);">Error al cargar.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="19" style="text-align:center; padding:32px; color:var(--rojo);">Error al cargar.</td></tr>';
   }
 }
 
