@@ -3309,7 +3309,13 @@ function descargarArchivo(contenido, nombre, tipo) {
               </div>
               <div class="form-group">
                 <label class="form-label">AFP (si aplica)</label>
-                <input type="text" id="p-afp" class="form-input" placeholder="Ej: HABITAT (12.84%)">
+                <select id="p-afp" class="form-input">
+                  <option value="">Sin AFP (ONP)</option>
+                  <option value="HABITAT">HABITAT</option>
+                  <option value="INTEGRA">INTEGRA</option>
+                  <option value="PRIMA">PRIMA</option>
+                  <option value="PROFUTURO">PROFUTURO</option>
+                </select>
               </div>
               <div class="form-group">
                 <label class="form-label">5ta Categoría (S/.)</label>
