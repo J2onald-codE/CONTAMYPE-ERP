@@ -1245,7 +1245,7 @@ async function cargarProductosLista() {
         <td>${row[1]||'-'}</td>
         <td>${row[2]||'-'}</td>
         <td>${row[3]||'-'}</td>
-        <td><b>S/. ${parseFloat(row[4]||0).toFixed(2)}</b></td>
+        parseFloat((row[4]||0).toString().replace(',','.'))
         <td>${badgeBarras}</td>
         <td>${row[6]||'0'}</td>
       </tr>`;
@@ -3293,12 +3293,19 @@ function descargarArchivo(contenido, nombre, tipo) {
                 <input type="number" id="p-asig" class="form-input" min="0" step="0.01" placeholder="0.00">
               </div>
               <div class="form-group">
-                <label class="form-label">Gratificación (S/.)</label>
-                <input type="number" id="p-grat" class="form-input" min="0" step="0.01" placeholder="0.00">
+               <label class="form-label">Régimen *</label>
+               <select id="p-regimen" class="form-input" required>
+                <option value="">Seleccionar...</option>
+                <option value="MICROEMPRESA">MICROEMPRESA</option>
+                <option value="PEQUEÑA EMPRESA">PEQUEÑA EMPRESA</option>
+               </select>
               </div>
               <div class="form-group">
-                <label class="form-label">Vacaciones (S/.)</label>
-                <input type="number" id="p-vac" class="form-input" min="0" step="0.01" placeholder="0.00">
+               <label class="form-label">¿Salió de vacaciones este mes?</label>
+               <select id="p-vacaciones" class="form-input">
+                <option value="NO">NO</option>
+                <option value="SI">SI</option>
+               </select>
               </div>
               <div class="form-group">
                 <label class="form-label">AFP (si aplica)</label>
@@ -3339,9 +3346,8 @@ function descargarArchivo(contenido, nombre, tipo) {
             <thead>
               <tr>
                 <th>Nombres</th><th>Mes</th><th>Sueldo</th><th>Asig. Fam.</th>
-                <th>Gratif.</th><th>Vac.</th><th>AFP</th><th>AFP Monto</th>
-                <th>ONP</th><th>Total Dcto.</th><th>Neto Pagar</th>
-                <th>EsSalud</th><th>Total Aporte</th><th>Medio Pago</th><th>Req. Ajuste</th>
+                <th>Gratif.</th><th>CTS</th><th>Régimen</th><th>AFP Monto</th>
+                <th>Total Dcto.</th><th>Neto Pagar</th><th>Medio Pago</th><th>Req. Ajuste</th>
               </tr>
             </thead>
             <tbody id="planilla-tbody">
@@ -4610,36 +4616,46 @@ async function guardarPlanilla() {
   const nombres = document.getElementById('p-nombres').value.trim();
   const mes = document.getElementById('p-mes').value;
   const sueldo = document.getElementById('p-sueldo').value;
-  if (!nombres || !mes || !sueldo) {
+  const regimen = document.getElementById('p-regimen').value;
+  if (!nombres || !mes || !sueldo || !regimen) {
     msg.style.display='block'; msg.style.background='#FFF5F5'; msg.style.color='var(--rojo)';
     msg.style.padding='10px 14px'; msg.style.borderRadius='8px'; msg.style.border='1px solid #FED7D7';
-    msg.textContent='⚠️ Nombres, mes y sueldo son obligatorios.'; return;
+    msg.textContent='⚠️ Nombres, mes, sueldo y régimen son obligatorios.'; return;
   }
   btn.disabled=true; btn.textContent='⏳ Guardando...';
   try {
     const accessToken = await obtenerAccessToken();
     const idPlanilla = 'PL-' + Date.now();
-    // Columnas: ID PLANILLA, NOMBRES, MES PAGO, SUELDO, ASIG FAM, GRATIF, VAC, AFP, AFP MONTO(vacio), 5TA CAT, ONP(vacio), TOTAL DCTO(vacio), NETO(vacio), ESSALUD(vacio), TOTAL APORTE(vacio), MEDIO PAGO, ASIENTO LD(oculto-vacio), REQUIERE AJUSTE, SUELDO BASE(vacio), DATOS ADICIONALES(vacio)
+    // Columnas reales de la hoja PLANILLA (A:W):
+    // A=ID, B=NOMBRES, C=MES PAGO, D=SUELDO, E=ASIG FAM, F=GRATIFICACION(auto),
+    // G=VACACIONES(auto), H=AFP, I=AFP MONTO(auto), J=CTS(auto), K=5TA CAT,
+    // L=ONP(auto), M=TOTAL DCTO(auto), N=NETO A PAGAR(auto), O=ESSALUD(auto),
+    // P=TOTAL APORTE(auto), Q=MEDIO DE PAGO, R=ASIENTO LD(sistema-oculto),
+    // S=REQUIERE AJUSTE, T=SUELDO BASE(sistema), U=DATOS ADICIONALES BASE(sistema),
+    // V=REGIMEN, W=SALIO DE VACACIONES
     const fila = [
       idPlanilla, nombres, mes, sueldo,
-      document.getElementById('p-asig').value||0,
-      document.getElementById('p-grat').value||0,
-      document.getElementById('p-vac').value||0,
-      document.getElementById('p-afp').value||'',
-      '', // AFP MONTO - Apps Script calcula
-      document.getElementById('p-quinta').value||0,
-      '', // ONP - Apps Script calcula
-      '', // TOTAL DCTO - Apps Script calcula
-      '', // NETO A PAGAR - Apps Script calcula
-      '', // ESSALUD - Apps Script calcula
-      '', // TOTAL APORTE - Apps Script calcula
+      document.getElementById('p-asig').value || 0,
+      '', // F - GRATIFICACION (Apps Script calcula)
+      '', // G - VACACIONES (Apps Script calcula)
+      document.getElementById('p-afp').value || '',
+      '', // I - AFP MONTO (Apps Script calcula)
+      '', // J - CTS (Apps Script calcula)
+      document.getElementById('p-quinta').value || 0,
+      '', // L - ONP (Apps Script calcula)
+      '', // M - TOTAL DCTO (Apps Script calcula)
+      '', // N - NETO A PAGAR (Apps Script calcula)
+      '', // O - ESSALUD (Apps Script calcula)
+      '', // P - TOTAL APORTE (Apps Script calcula)
       document.getElementById('p-medio-pago').value,
-      '', // ASIENTO LD - sistema (oculto)
-      document.getElementById('p-requiere-ajuste').value||'',
-      '', // SUELDO BASE - sistema
-      ''  // DATOS ADICIONALES BASE - sistema
+      '', // R - ASIENTO LD (sistema)
+      '', // S - REQUIERE AJUSTE (sistema)
+      '', // T - SUELDO BASE (sistema)
+      '', // U - DATOS ADICIONALES BASE (sistema)
+      regimen, // V - REGIMEN
+      document.getElementById('p-vacaciones').value || 'NO' // W - SALIO DE VACACIONES
     ];
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/PLANILLA!A:T:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`;
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/PLANILLA!A:W:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`;
     const resp = await fetch(url, {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
