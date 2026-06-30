@@ -4684,39 +4684,37 @@ async function cargarPlanilla() {
   const tbody = document.getElementById('planilla-tbody');
   const count = document.getElementById('planilla-count');
   if (!tbody) return;
-  tbody.innerHTML = '<tr><td colspan="15" style="text-align:center; padding:24px;"><div class="loading"><div class="spinner"></div> Cargando...</div></td></tr>';
+  tbody.innerHTML = '<tr><td colspan="12" style="text-align:center; padding:24px;"><div class="loading"><div class="spinner"></div> Cargando...</div></td></tr>';
   try {
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/PLANILLA!A2:T500?key=${API_KEY}`;
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/PLANILLA!A2:W500?key=${API_KEY}`;
     const resp = await fetch(url);
     const data = await resp.json();
     if (!data.values || data.values.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="15" style="text-align:center; padding:32px; color:#A0AEC0;">Sin registros de planilla.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="12" style="text-align:center; padding:32px; color:#A0AEC0;">Sin registros de planilla.</td></tr>';
       if (count) count.textContent = '0 registros'; return;
     }
     const rows = data.values;
     if (count) count.textContent = rows.length + ' registro(s)';
     tbody.innerHTML = rows.map(row => {
-      const reqAjuste = (row[17]||'').trim();
+      const reqAjuste = (row[18]||'').trim(); // S - REQUIERE AJUSTE
       const badgeAjuste = reqAjuste ? '<span class="badge badge-amarillo">⚠️ Ajuste</span>' : '<span class="badge badge-verde">OK</span>';
+      const regimen = (row[21]||'-').trim(); // V - REGIMEN
       return `<tr>
         <td>${row[1]||'-'}</td><td>${row[2]||'-'}</td>
         <td>S/. ${parseFloat(row[3]||0).toFixed(2)}</td>
         <td>S/. ${parseFloat(row[4]||0).toFixed(2)}</td>
         <td>S/. ${parseFloat(row[5]||0).toFixed(2)}</td>
         <td>S/. ${parseFloat(row[6]||0).toFixed(2)}</td>
-        <td>${row[7]||'-'}</td>
-        <td>S/. ${parseFloat(row[8]||0).toFixed(2)}</td>
-        <td>S/. ${parseFloat(row[10]||0).toFixed(2)}</td>
-        <td>S/. ${parseFloat(row[11]||0).toFixed(2)}</td>
-        <td><b>S/. ${parseFloat(row[12]||0).toFixed(2)}</b></td>
+        <td>${regimen}</td>
+        <td>S/. ${parseFloat(row[9]||0).toFixed(2)}</td>
         <td>S/. ${parseFloat(row[13]||0).toFixed(2)}</td>
         <td>S/. ${parseFloat(row[14]||0).toFixed(2)}</td>
-        <td>${row[15]||'-'}</td>
+        <td>${row[16]||'-'}</td>
         <td>${badgeAjuste}</td>
       </tr>`;
     }).join('');
   } catch(err) {
-    tbody.innerHTML = '<tr><td colspan="15" style="text-align:center; padding:32px; color:var(--rojo);">Error al cargar.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="12" style="text-align:center; padding:32px; color:var(--rojo);">Error al cargar.</td></tr>';
   }
 }
 
