@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Contamype ERP — Sistema de Gestión</title>
-<script src="https://accounts.google.com/gsi/client" async defer>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 
 // ══ MÓDULO DE VENTAS ═════════════════════════════════════════════════════
 let streamEscaner = null;
@@ -984,25 +984,33 @@ async function cargarPlanilla() {
     const rows = data.values;
     if (count) count.textContent = rows.length + ' registro(s)';
     tbody.innerHTML = rows.map(row => {
-      const reqAjuste = (row[17]||'').trim();
-      const badgeAjuste = reqAjuste ? '<span class="badge badge-amarillo">⚠️ Ajuste</span>' : '<span class="badge badge-verde">OK</span>';
-      return `<tr>
-        <td>${row[1]||'-'}</td><td>${row[2]||'-'}</td>
-        <td>S/. ${parseFloat(row[3]||0).toFixed(2)}</td>
-        <td>S/. ${parseFloat(row[4]||0).toFixed(2)}</td>
-        <td>S/. ${parseFloat(row[5]||0).toFixed(2)}</td>
-        <td>S/. ${parseFloat(row[6]||0).toFixed(2)}</td>
-        <td>${row[7]||'-'}</td>
-        <td>S/. ${parseFloat(row[8]||0).toFixed(2)}</td>
-        <td>S/. ${parseFloat(row[10]||0).toFixed(2)}</td>
-        <td>S/. ${parseFloat(row[11]||0).toFixed(2)}</td>
-        <td><b>S/. ${parseFloat(row[12]||0).toFixed(2)}</b></td>
-        <td>S/. ${parseFloat(row[13]||0).toFixed(2)}</td>
-        <td>S/. ${parseFloat(row[14]||0).toFixed(2)}</td>
-        <td>${row[15]||'-'}</td>
-        <td>${badgeAjuste}</td>
-      </tr>`;
-    }).join('');
+  const reqAjuste = (row[18]||'').trim();
+  const badgeAjuste = reqAjuste ? '<span class="badge badge-amarillo">⚠️ Ajuste</span>' : '<span class="badge badge-verde">OK</span>';
+  const regimen = (row[21]||'-').trim();
+  const salioVac = (row[22]||'-').trim();
+  const p = (val) => parseFloat((val||0).toString().replace(',','.')).toFixed(2);
+  return `<tr>
+    <td>${row[1]||'-'}</td>
+    <td>${row[2]||'-'}</td>
+    <td>S/. ${p(row[3])}</td>
+    <td>S/. ${p(row[4])}</td>
+    <td>S/. ${p(row[5])}</td>
+    <td>S/. ${p(row[6])}</td>
+    <td>S/. ${p(row[9])}</td>
+    <td>${row[7]||'-'}</td>
+    <td>S/. ${p(row[8])}</td>
+    <td>S/. ${p(row[10])}</td>
+    <td>S/. ${p(row[11])}</td>
+    <td>S/. ${p(row[12])}</td>
+    <td><b>S/. ${p(row[13])}</b></td>
+    <td>S/. ${p(row[14])}</td>
+    <td>S/. ${p(row[15])}</td>
+    <td>${row[16]||'-'}</td>
+    <td>${regimen}</td>
+    <td>${salioVac}</td>
+    <td>${badgeAjuste}</td>
+  </tr>`;
+}).join('');
   } catch(err) {
     tbody.innerHTML = '<tr><td colspan="15" style="text-align:center; padding:32px; color:var(--rojo);">Error al cargar.</td></tr>';
   }
@@ -4705,7 +4713,7 @@ async function cargarPlanilla() {
       return `<tr>
         <td>${row[1]||'-'}</td>
         <td>${row[2]||'-'}</td>
-        <td>S/. ${parseFloat(row[3]||0).toFixed(2)}</td>
+        <td>S/. ${parseFloat((row[3]||0).toString().replace(',','.')).toFixed(2)}</td>
         <td>S/. ${parseFloat(row[4]||0).toFixed(2)}</td>
         <td>S/. ${parseFloat(row[5]||0).toFixed(2)}</td>
         <td>S/. ${parseFloat(row[6]||0).toFixed(2)}</td>
