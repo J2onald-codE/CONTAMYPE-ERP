@@ -991,8 +991,12 @@ async function cargarPlanilla() {
   const p = (val) => {
     if (!val && val !== 0) return '0.00';
     const str = val.toString().trim();
-    const sinMiles = str.replace(/,(?=\d{3})/g, '').replace(',', '.');
-    return (parseFloat(sinMiles) || 0).toFixed(2);
+    // Si tiene punto Y coma: formato "1,200.00" → quitar comas de miles
+    if (str.includes('.') && str.includes(',')) {
+      return (parseFloat(str.replace(/,/g, '')) || 0).toFixed(2);
+    }
+    // Si solo tiene coma: formato "1200,00" → reemplazar por punto
+    return (parseFloat(str.replace(',', '.')) || 0).toFixed(2);
   };
   return `<tr>
     <td>${row[1]||'-'}</td>
