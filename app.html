@@ -988,7 +988,12 @@ async function cargarPlanilla() {
   const badgeAjuste = reqAjuste ? '<span class="badge badge-amarillo">⚠️ Ajuste</span>' : '<span class="badge badge-verde">OK</span>';
   const regimen = (row[21]||'-').trim();
   const salioVac = (row[22]||'-').trim();
-  const p = (val) => parseFloat((val||0).toString().replace(',','.')).toFixed(2);
+  const p = (val) => {
+    if (!val && val !== 0) return '0.00';
+    const str = val.toString().trim();
+    const sinMiles = str.replace(/,(?=\d{3})/g, '').replace(',', '.');
+    return (parseFloat(sinMiles) || 0).toFixed(2);
+  };
   return `<tr>
     <td>${row[1]||'-'}</td>
     <td>${row[2]||'-'}</td>
@@ -1009,8 +1014,8 @@ async function cargarPlanilla() {
     <td>${regimen}</td>
     <td>${salioVac}</td>
     <td>${badgeAjuste}</td>
-  </tr>`;
-}).join('');
+ </tr>`;
+ }).join('');
   } catch(err) {
     tbody.innerHTML = '<tr><td colspan="15" style="text-align:center; padding:32px; color:var(--rojo);">Error al cargar.</td></tr>';
   }
