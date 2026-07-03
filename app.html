@@ -989,7 +989,7 @@ async function cargarPlanilla() {
   const regimen = (row[21]||'-').trim();
   const salioVac = (row[22]||'-').trim();
   const p = (val) => {
-    if (!val && val !== 0) return '0,000.00';
+    if (!val && val !== 0) return '0.00';
     const str = val.toString().trim();
     const sinMiles = str.replace(/,(?=\d{3})/g, '').replace(',', '.');
     return (parseFloat(sinMiles) || 0).toFixed(2);
