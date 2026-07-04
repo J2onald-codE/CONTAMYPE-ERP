@@ -990,13 +990,15 @@ async function cargarPlanilla() {
   const salioVac = (row[22]||'-').trim();
   const p = (val) => {
     if (!val && val !== 0) return '0.00';
+    // Si ya es número, usarlo directo
+    if (typeof val === 'number') return val.toFixed(2);
     const str = val.toString().trim();
-    // Si tiene punto Y coma: formato "1,200.00" → quitar comas de miles
-    if (str.includes('.') && str.includes(',')) {
-      return (parseFloat(str.replace(/,/g, '')) || 0).toFixed(2);
-    }
-    // Si solo tiene coma: formato "1200,00" → reemplazar por punto
-    return (parseFloat(str.replace(',', '.')) || 0).toFixed(2);
+    // Quitar TODOS los puntos y comas excepto el último separador decimal
+    // Formato "1,200" → quitar coma → "1200"
+    // Formato "1,200.00" → quitar comas → "1200.00"  
+    // Formato "1200,00" → reemplazar coma → "1200.00"
+    const sinMiles = str.replace(/\./g, '').replace(',', '.');
+    return (parseFloat(sinMiles) || 0).toFixed(2);
   };
   return `<tr>
     <td>${row[1]||'-'}</td>
