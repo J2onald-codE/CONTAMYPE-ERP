@@ -4962,37 +4962,6 @@ async function cargarLibroDiario() {
   }
 }
 
-async function cargarLibroMayor() {
-  const tbody = document.getElementById('lm-tbody');
-  const count = document.getElementById('lm-count');
-  if (!tbody) return;
-  tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:24px;"><div class="loading"><div class="spinner"></div> Cargando...</div></td></tr>';
-  try {
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/LIBRO%20MAYOR!A2:H500?key=${API_KEY}`;
-    const resp = await fetch(url);
-    const data = await resp.json();
-    if (!data.values || data.values.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:32px; color:#A0AEC0;">Sin registros en Libro Mayor.</td></tr>';
-      if (count) count.textContent = '0 registros'; return;
-    }
-    const rows = data.values;
-    if (count) count.textContent = rows.length + ' línea(s)';
-    tbody.innerHTML = rows.map(row => {
-      const saldo = parseFloat(row[7]||0);
-      const saldoClass = saldo >= 0 ? 'color:var(--verde);' : 'color:var(--rojo);';
-      return `<tr>
-        <td>${row[0]||'-'}</td><td><b>${row[1]||'-'}</b></td><td>${row[2]||'-'}</td>
-        <td>${row[3]||'-'}</td><td>${row[4]||'-'}</td>
-        <td>S/. ${parseFloat(row[5]||0).toFixed(2)}</td>
-        <td>S/. ${parseFloat(row[6]||0).toFixed(2)}</td>
-        <td style="${saldoClass} font-weight:700;">S/. ${saldo.toFixed(2)}</td>
-      </tr>`;
-    }).join('');
-  } catch(err) {
-    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:32px; color:var(--rojo);">Error al cargar.</td></tr>';
-  }
-}
-
 async function cargarEstadoResultados() {
   const body = document.getElementById('er-body');
   if (!body) return;
