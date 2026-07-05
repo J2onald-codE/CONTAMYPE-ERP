@@ -4707,7 +4707,7 @@ async function cargarPlanilla() {
   if (!tbody) return;
   tbody.innerHTML = '<tr><td colspan="19" style="text-align:center; padding:24px;"><div class="loading"><div class="spinner"></div> Cargando...</div></td></tr>';
   try {
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/PLANILLA!A2:W500?key=${API_KEY}&valueRenderOption=UNFORMATTED_VALUE`;
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/PLANILLA!A2:W500?key=${API_KEY}&valueRenderOption=UNFORMATTED_VALUE&dateTimeRenderOption=FORMATTED_STRING`;
     const resp = await fetch(url);
     const data = await resp.json();
     if (!data.values || data.values.length === 0) {
