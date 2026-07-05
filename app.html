@@ -1105,38 +1105,114 @@ async function cargarEstadoResultados() {
   if (!body) return;
   body.innerHTML = '<div class="loading"><div class="spinner"></div> Cargando...</div>';
   try {
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/ESTADOS%20RESULTADOS!A2:M2?key=${API_KEY}`;
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/ESTADOS%20RESULTADOS!A2:N2?key=${API_KEY}&valueRenderOption=UNFORMATTED_VALUE`;
     const resp = await fetch(url);
     const data = await resp.json();
     if (!data.values || data.values.length === 0) {
-      body.innerHTML = '<div class="empty-state"><div class="empty-icon">📊</div><p>Sin datos de Estado de Resultados.</p></div>'; return;
+      body.innerHTML = '<p style="text-align:center; color:#A0AEC0; padding:32px;">Sin datos de Estado de Resultados.</p>';
+      return;
     }
-    const row = data.values[0];
-    const p = (i) => parseFloat(row[i]||0).toFixed(2);
-    const color = (i) => parseFloat(row[i]||0) >= 0 ? 'var(--verde)' : 'var(--rojo)';
+    const r = data.values[0];
+    const p = (val) => {
+      if (!val && val !== 0) return '0.00';
+      if (typeof val === 'number') return val.toFixed(2);
+      return (parseFloat(val.toString().replace(/,/g, '')) || 0).toFixed(2);
+    };
+    const color = (val) => parseFloat(val) >= 0 ? 'var(--verde)' : 'var(--rojo)';
+
+    const ventasNetas = p(r[2]);
+    const costoVentas = p(r[3]);
+    const utilidadBruta = p(r[4]);
+    const gAdmin = p(r[5]);
+    const gVentas = p(r[6]);
+    const utilidadOperativa = p(r[7]);
+    const ingFinancieros = p(r[8]);
+    const gasFinancieros = p(r[9]);
+    const utilidadAntesImp = p(r[10]);
+    const irAnual = p(r[11]);
+    const utilidadNeta = p(r[12]);
+    const pagoACuenta = p(r[13]);
+    const periodo = r[1] || '-';
+
     body.innerHTML = `
-      <div style="max-width:600px; margin:0 auto;">
+      <div style="max-width:600px; margin:0 auto; font-family:inherit;">
         <div style="text-align:center; margin-bottom:24px;">
-          <div style="font-family:var(--font-display); font-size:1.2rem; font-weight:800; color:var(--negro);">ESTADO DE RESULTADOS</div>
-          <div style="font-size:0.85rem; color:var(--gris-texto);">Período: ${row[1]||'-'}</div>
+          <div style="font-size:0.85rem; color:#A0AEC0; text-transform:uppercase; letter-spacing:1px;">Régimen MYPE Tributario</div>
+          <div style="font-size:1.1rem; font-weight:700; color:var(--azul-oscuro);">Período: ${periodo}</div>
         </div>
-        ${erFila('(+) Ventas netas', p(2), 'var(--verde)')}
-        ${erFila('(-) Costo de ventas', p(3), 'var(--rojo)')}
-        ${erFilaSep('(=) Utilidad bruta', p(4), color(4))}
-        ${erFila('(-) Gastos administrativos', p(5), 'var(--rojo)')}
-        ${erFila('(-) Gastos de ventas', p(6), 'var(--rojo)')}
-        ${erFilaSep('(=) Utilidad operativa', p(7), color(7))}
-        ${erFila('(+) Ingresos financieros', p(8), 'var(--verde)')}
-        ${erFila('(-) Gastos financieros', p(9), 'var(--rojo)')}
-        ${erFilaSep('(=) Utilidad antes de impuestos', p(10), color(10))}
-        ${erFila('(-) Impuesto a la Renta (10%)', p(11), 'var(--rojo)')}
-        ${erFilaFinal('(=) UTILIDAD NETA', p(12), color(12))}
+
+        <div style="background:#F8FAFC; border-radius:12px; padding:20px; margin-bottom:16px;">
+          <div style="font-weight:700; color:var(--azul-oscuro); margin-bottom:12px; font-size:0.9rem; text-transform:uppercase; letter-spacing:0.5px;">📦 Ingresos</div>
+          <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #E2E8F0;">
+            <span style="color:#4A5568;">(+) Ventas Netas</span>
+            <span style="font-weight:600; color:${color(ventasNetas)}">S/. ${ventasNetas}</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; padding:8px 0;">
+            <span style="color:#4A5568;">(-) Costo de Ventas</span>
+            <span style="font-weight:600; color:var(--rojo)">S/. ${costoVentas}</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; padding:10px 0 0 0; border-top:2px solid var(--azul-oscuro); margin-top:4px;">
+            <span style="font-weight:700; color:var(--azul-oscuro);">(=) Utilidad Bruta</span>
+            <span style="font-weight:700; color:${color(utilidadBruta)}">S/. ${utilidadBruta}</span>
+          </div>
+        </div>
+
+        <div style="background:#F8FAFC; border-radius:12px; padding:20px; margin-bottom:16px;">
+          <div style="font-weight:700; color:var(--azul-oscuro); margin-bottom:12px; font-size:0.9rem; text-transform:uppercase; letter-spacing:0.5px;">💼 Gastos Operativos</div>
+          <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #E2E8F0;">
+            <span style="color:#4A5568;">(-) Gastos Administrativos</span>
+            <span style="font-weight:600; color:var(--rojo)">S/. ${gAdmin}</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; padding:8px 0;">
+            <span style="color:#4A5568;">(-) Gastos de Ventas</span>
+            <span style="font-weight:600; color:var(--rojo)">S/. ${gVentas}</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; padding:10px 0 0 0; border-top:2px solid var(--azul-oscuro); margin-top:4px;">
+            <span style="font-weight:700; color:var(--azul-oscuro);">(=) Utilidad Operativa</span>
+            <span style="font-weight:700; color:${color(utilidadOperativa)}">S/. ${utilidadOperativa}</span>
+          </div>
+        </div>
+
+        <div style="background:#F8FAFC; border-radius:12px; padding:20px; margin-bottom:16px;">
+          <div style="font-weight:700; color:var(--azul-oscuro); margin-bottom:12px; font-size:0.9rem; text-transform:uppercase; letter-spacing:0.5px;">💰 Financiero</div>
+          <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #E2E8F0;">
+            <span style="color:#4A5568;">(+) Ingresos Financieros</span>
+            <span style="font-weight:600; color:var(--verde)">S/. ${ingFinancieros}</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; padding:8px 0;">
+            <span style="color:#4A5568;">(-) Gastos Financieros</span>
+            <span style="font-weight:600; color:var(--rojo)">S/. ${gasFinancieros}</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; padding:10px 0 0 0; border-top:2px solid var(--azul-oscuro); margin-top:4px;">
+            <span style="font-weight:700; color:var(--azul-oscuro);">(=) Utilidad Antes de Impuestos</span>
+            <span style="font-weight:700; color:${color(utilidadAntesImp)}">S/. ${utilidadAntesImp}</span>
+          </div>
+        </div>
+
+        <div style="background:#F8FAFC; border-radius:12px; padding:20px; margin-bottom:16px;">
+          <div style="font-weight:700; color:var(--azul-oscuro); margin-bottom:12px; font-size:0.9rem; text-transform:uppercase; letter-spacing:0.5px;">🏛️ Impuesto a la Renta — RMT</div>
+          <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #E2E8F0;">
+            <span style="color:#4A5568;">(-) IR Anual (10% / 29.5%)</span>
+            <span style="font-weight:600; color:var(--rojo)">S/. ${irAnual}</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; padding:8px 0;">
+            <span style="color:#4A5568;">Pago a Cuenta Mensual (1%)</span>
+            <span style="font-weight:600; color:#E67E22">S/. ${pagoACuenta}</span>
+          </div>
+        </div>
+
+        <div style="background:var(--azul-oscuro); border-radius:12px; padding:20px;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-weight:800; color:#FFFFFF; font-size:1.1rem;">(=) UTILIDAD NETA</span>
+            <span style="font-weight:800; font-size:1.3rem; color:${parseFloat(utilidadNeta) >= 0 ? '#68D391' : '#FC8181'}">S/. ${utilidadNeta}</span>
+          </div>
+        </div>
+
       </div>`;
   } catch(err) {
-    body.innerHTML = '<div style="text-align:center; color:var(--rojo); padding:32px;">Error al cargar Estado de Resultados.</div>';
+    body.innerHTML = '<p style="text-align:center; color:var(--rojo); padding:32px;">Error al cargar Estado de Resultados.</p>';
   }
 }
-
 function erFila(label, val, color) {
   return `<div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--gris-claro); font-size:0.9rem;">
     <span style="color:var(--gris-texto);">${label}</span>
@@ -4750,18 +4826,15 @@ async function cargarPlanilla() {
 
 // ══ LIBROS CONTABLES ══════════════════════════════════════════════════════
 function mostrarLibro(tipo) {
-  ['diario','mayor','er'].forEach(t => {
-    document.getElementById('card-libro-' + (t === 'er' ? 'er' : t === 'diario' ? 'diario' : 'mayor')).style.display = 'none';
-  });
-  document.getElementById('card-libro-' + (tipo === 'er' ? 'er' : tipo === 'diario' ? 'diario' : 'mayor')).style.display = 'block';
-
-  document.querySelectorAll('#page-libros .btn-action').forEach(b => b.classList.add('btn-secondary-action'));
-  const btnMap = { diario: 'btn-libro-diario', mayor: 'btn-libro-mayor', er: 'btn-estado-resultados' };
-  document.getElementById(btnMap[tipo]).classList.remove('btn-secondary-action');
-
+  document.getElementById('card-libro-diario').style.display = tipo === 'diario' ? 'block' : 'none';
+  document.getElementById('card-libro-mayor').style.display = tipo === 'mayor' ? 'block' : 'none';
+  document.getElementById('card-er').style.display = tipo === 'er' ? 'block' : 'none';
+  document.getElementById('btn-libro-diario').className = tipo === 'diario' ? 'btn-action' : 'btn-action btn-secondary-action';
+  document.getElementById('btn-libro-mayor').className = tipo === 'mayor' ? 'btn-action' : 'btn-action btn-secondary-action';
+  document.getElementById('btn-estado-resultados').className = tipo === 'er' ? 'btn-action' : 'btn-action btn-secondary-action';
   if (tipo === 'diario') cargarLibroDiario();
-  else if (tipo === 'mayor') cargarLibroMayor();
-  else cargarEstadoResultados();
+  if (tipo === 'mayor') cargarLibroMayor();
+  if (tipo === 'er') cargarEstadoResultados();
 }
 
 async function cargarLibroDiario() {
