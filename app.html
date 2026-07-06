@@ -1070,12 +1070,12 @@ async function cargarLibroDiario() {
 }
 
 async function cargarLibroMayor() {
+  const tbody = document.getElementById('lm-tbody');
   const count = document.getElementById('lm-count');
-  const contenedor = document.getElementById('card-libro-mayor');
-  const cardBody = contenedor.querySelector('.card-body');
-  cardBody.innerHTML = '<div class="loading"><div class="spinner"></div> Cargando...</div>';
+  if (!tbody) return;
+  tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:24px;"><div class="loading"><div class="spinner"></div> Cargando...</div></td></tr>';
   try {
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/LIBRO%20MAYOR!A2:H500?key=${API_KEY}&valueRenderOption=UNFORMATTED_VALUE&dateTimeRenderOption=FORMATTED_STRING`;
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/LIBRO%20MAYOR!A2:H500?key=${API_KEY}`;
     const resp = await fetch(url);
     const data = await resp.json();
     if (!data.values || data.values.length === 0) {
@@ -4924,12 +4924,12 @@ async function cargarLibroDiario() {
 }
 
 async function cargarLibroMayor() {
+  const tbody = document.getElementById('lm-tbody');
   const count = document.getElementById('lm-count');
-  const contenedor = document.getElementById('card-libro-mayor');
-  const cardBody = contenedor.querySelector('.card-body');
-  cardBody.innerHTML = '<div class="loading"><div class="spinner"></div> Cargando...</div>';
+  if (!tbody) return;
+  tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:24px;"><div class="loading"><div class="spinner"></div> Cargando...</div></td></tr>';
   try {
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/LIBRO%20MAYOR!A2:H500?key=${API_KEY}&valueRenderOption=UNFORMATTED_VALUE&dateTimeRenderOption=FORMATTED_STRING`;
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/LIBRO%20MAYOR!A2:H500?key=${API_KEY}`;
     const resp = await fetch(url);
     const data = await resp.json();
     if (!data.values || data.values.length === 0) {
