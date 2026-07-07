@@ -1070,16 +1070,16 @@ async function cargarLibroDiario() {
 }
 
 async function cargarLibroMayor() {
-  const tbody = document.getElementById('lm-tbody');
+  const container = document.getElementById('lm-container');
   const count = document.getElementById('lm-count');
-  if (!tbody) return;
-  tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:24px;"><div class="loading"><div class="spinner"></div> Cargando...</div></td></tr>';
+  if (!container) return;
+  container.innerHTML = '<div class="loading"><div class="spinner"></div> Cargando...</div>';
   try {
     const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/LIBRO%20MAYOR!A2:H500?key=${API_KEY}`;
     const resp = await fetch(url);
     const data = await resp.json();
     if (!data.values || data.values.length === 0) {
-      cardBody.innerHTML = '<p style="text-align:center; color:#A0AEC0; padding:32px;">Sin registros en Libro Mayor.</p>';
+      container.innerHTML = '<p style="text-align:center; color:#A0AEC0; padding:32px;">Sin registros en Libro Mayor.</p>';
       if (count) count.textContent = '0 línea(s)'; return;
     }
     const rows = data.values;
@@ -1103,7 +1103,7 @@ async function cargarLibroMayor() {
       '6213':'COMPENSACION POR TIEMPO DE SERVICIOS','6271':'REGIMEN DE PRESTACIONES DE SALUD',
       '881':'IMPUESTO A LAS GANANCIAS - CORRIENTE'
     };
-    let html = '<div style="padding:16px;">';
+    let html = '<div>';
     Object.keys(cuentas).sort().forEach(cuenta => {
       const movimientos = cuentas[cuenta];
       const nombre = nombresCuenta[cuenta] || 'CUENTA ' + cuenta;
@@ -1123,18 +1123,19 @@ async function cargarLibroMayor() {
         </tr>`;
       }).join('');
       html += `<div style="margin-bottom:24px; border:1px solid #E2E8F0; border-radius:10px; overflow:hidden;">
-        <div style="background:var(--azul-oscuro); padding:10px 14px; display:flex; justify-content:space-between; align-items:center;">
+        <div style="background:var(--azul-oscuro); padding:10px 14px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
           <div>
             <span style="font-weight:700; color:#FFFFFF; font-size:0.95rem;">Cuenta: ${cuenta}</span>
             <span style="color:#BEE3F8; font-size:0.8rem; margin-left:10px;">${nombre}</span>
           </div>
           <span style="color:#BEE3F8; font-size:0.8rem;">${movimientos.length} movimiento(s)</span>
         </div>
+        <div style="overflow-x:auto;">
         <table style="width:100%; border-collapse:collapse;">
           <thead>
             <tr style="background:#EBF8FF;">
               <th style="padding:8px; border:1px solid #E2E8F0; font-size:0.8rem; text-align:left; color:var(--azul-oscuro);">Fecha</th>
-              <th style="padding:8px; border:1px solid #E2E8F0; font-size:0.8rem; text-align:center; color:var(--azul-oscuro);">N° Corr.</th>
+              <th style="padding:8px; border:1px solid #E2E8F0; font-size:0.8rem; text-align:center; color:var(--azul-oscuro);">N° Corr. Libro Diario</th>
               <th style="padding:8px; border:1px solid #E2E8F0; font-size:0.8rem; text-align:left; color:var(--azul-oscuro);">Glosa</th>
               <th style="padding:8px; border:1px solid #E2E8F0; font-size:0.8rem; text-align:right; color:var(--azul-oscuro);">Debe</th>
               <th style="padding:8px; border:1px solid #E2E8F0; font-size:0.8rem; text-align:right; color:var(--azul-oscuro);">Haber</th>
@@ -1151,12 +1152,14 @@ async function cargarLibroMayor() {
             </tr>
           </tbody>
         </table>
+        </div>
       </div>`;
     });
     html += '</div>';
-    cardBody.innerHTML = html;
+    container.innerHTML = html;
   } catch(err) {
-    cardBody.innerHTML = '<p style="text-align:center; color:var(--rojo); padding:32px;">Error al cargar Libro Mayor.</p>';
+    container.innerHTML = '<p style="text-align:center; color:var(--rojo); padding:32px;">Error al cargar Libro Mayor.</p>';
+    console.error(err);
   }
 }
 
@@ -3543,22 +3546,17 @@ function descargarArchivo(contenido, nombre, tipo) {
           </table>
         </div>
       </div>
-      <div class="card" id="card-libro-mayor" style="display:none;">
-        <div class="card-header">
-          <span class="card-title">📗 Libro Mayor — PCGE</span>
-          <span id="lm-count" style="font-size:0.8rem; color:#A0AEC0;">Cargando...</span>
-        </div>
-        <div class="card-body" style="padding:0; overflow-x:auto;">
-          <table class="data-table">
-            <thead>
-              <tr><th>ID</th><th>Cuenta</th><th>Fecha</th><th>N° Op.</th><th>Glosa</th><th>Debe</th><th>Haber</th><th>Saldo</th></tr>
-            </thead>
-            <tbody id="lm-tbody">
-              <tr><td colspan="8" style="text-align:center; padding:32px; color:#A0AEC0;">Cargando...</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
+     <div class="card" id="card-libro-mayor" style="display:none;">
+       <div class="card-header">
+         <span class="card-title">📗 Libro Mayor — PCGE</span>
+         <span id="lm-count" style="font-size:0.8rem; color:#A0AEC0;">Cargando...</span>
+       </div>
+       <div class="card-body" style="padding:0;">
+         <div id="lm-container" style="padding:16px;">
+           <div class="loading"><div class="spinner"></div> Cargando...</div>
+         </div>
+       </div>
+     </div>
       <div class="card" id="card-er" style="display:none;">
         <div class="card-header">
           <span class="card-title">📊 Estado de Resultados</span>
@@ -4920,16 +4918,16 @@ async function cargarLibroDiario() {
 }
 
 async function cargarLibroMayor() {
-  const tbody = document.getElementById('lm-tbody');
+  const container = document.getElementById('lm-container');
   const count = document.getElementById('lm-count');
-  if (!tbody) return;
-  tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:24px;"><div class="loading"><div class="spinner"></div> Cargando...</div></td></tr>';
+  if (!container) return;
+  container.innerHTML = '<div class="loading"><div class="spinner"></div> Cargando...</div>';
   try {
     const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/LIBRO%20MAYOR!A2:H500?key=${API_KEY}`;
     const resp = await fetch(url);
     const data = await resp.json();
     if (!data.values || data.values.length === 0) {
-      cardBody.innerHTML = '<p style="text-align:center; color:#A0AEC0; padding:32px;">Sin registros en Libro Mayor.</p>';
+      container.innerHTML = '<p style="text-align:center; color:#A0AEC0; padding:32px;">Sin registros en Libro Mayor.</p>';
       if (count) count.textContent = '0 línea(s)'; return;
     }
     const rows = data.values;
@@ -4953,7 +4951,7 @@ async function cargarLibroMayor() {
       '6213':'COMPENSACION POR TIEMPO DE SERVICIOS','6271':'REGIMEN DE PRESTACIONES DE SALUD',
       '881':'IMPUESTO A LAS GANANCIAS - CORRIENTE'
     };
-    let html = '<div style="padding:16px;">';
+    let html = '<div>';
     Object.keys(cuentas).sort().forEach(cuenta => {
       const movimientos = cuentas[cuenta];
       const nombre = nombresCuenta[cuenta] || 'CUENTA ' + cuenta;
@@ -4973,18 +4971,19 @@ async function cargarLibroMayor() {
         </tr>`;
       }).join('');
       html += `<div style="margin-bottom:24px; border:1px solid #E2E8F0; border-radius:10px; overflow:hidden;">
-        <div style="background:var(--azul-oscuro); padding:10px 14px; display:flex; justify-content:space-between; align-items:center;">
+        <div style="background:var(--azul-oscuro); padding:10px 14px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
           <div>
             <span style="font-weight:700; color:#FFFFFF; font-size:0.95rem;">Cuenta: ${cuenta}</span>
             <span style="color:#BEE3F8; font-size:0.8rem; margin-left:10px;">${nombre}</span>
           </div>
           <span style="color:#BEE3F8; font-size:0.8rem;">${movimientos.length} movimiento(s)</span>
         </div>
+        <div style="overflow-x:auto;">
         <table style="width:100%; border-collapse:collapse;">
           <thead>
             <tr style="background:#EBF8FF;">
               <th style="padding:8px; border:1px solid #E2E8F0; font-size:0.8rem; text-align:left; color:var(--azul-oscuro);">Fecha</th>
-              <th style="padding:8px; border:1px solid #E2E8F0; font-size:0.8rem; text-align:center; color:var(--azul-oscuro);">N° Corr.</th>
+              <th style="padding:8px; border:1px solid #E2E8F0; font-size:0.8rem; text-align:center; color:var(--azul-oscuro);">N° Corr. Libro Diario</th>
               <th style="padding:8px; border:1px solid #E2E8F0; font-size:0.8rem; text-align:left; color:var(--azul-oscuro);">Glosa</th>
               <th style="padding:8px; border:1px solid #E2E8F0; font-size:0.8rem; text-align:right; color:var(--azul-oscuro);">Debe</th>
               <th style="padding:8px; border:1px solid #E2E8F0; font-size:0.8rem; text-align:right; color:var(--azul-oscuro);">Haber</th>
@@ -5001,15 +5000,16 @@ async function cargarLibroMayor() {
             </tr>
           </tbody>
         </table>
+        </div>
       </div>`;
     });
     html += '</div>';
-    cardBody.innerHTML = html;
+    container.innerHTML = html;
   } catch(err) {
-    cardBody.innerHTML = '<p style="text-align:center; color:var(--rojo); padding:32px;">Error al cargar Libro Mayor.</p>';
+    container.innerHTML = '<p style="text-align:center; color:var(--rojo); padding:32px;">Error al cargar Libro Mayor.</p>';
+    console.error(err);
   }
 }
-
 async function cargarEstadoResultados() {
   const body = document.getElementById('er-body');
   if (!body) return;
