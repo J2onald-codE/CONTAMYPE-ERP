@@ -2888,8 +2888,15 @@ function descargarArchivo(contenido, nombre, tipo) {
           <span id="compras-count" style="font-size:0.8rem; color:#A0AEC0;">Cargando...</span>
         </div>
         <div class="card-body" style="padding:0; overflow-x:auto;">
-                  <div class="loading"><div class="spinner"></div> Cargando...</div>
-                </div>
+          <table class="data-table">
+            <thead>
+              <tr><th>ID</th><th>Cuenta</th><th>Fecha</th><th>N° Op.</th><th>Glosa</th><th>Debe</th><th>Haber</th><th>Saldo</th></tr>
+            </thead>
+            <tbody id="lm-tbody">
+              <tr><td colspan="8" style="text-align:center; padding:32px; color:#A0AEC0;">Cargando...</td></tr>
+            </tbody>
+          </table>
+        </div>
         </div>
       </div>
     </div>
