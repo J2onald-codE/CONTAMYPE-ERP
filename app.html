@@ -1301,6 +1301,7 @@ function erFilaFinal(label, val, color) {
 const originalShowPage = showPage;
 window.showPage = function(page) {
   originalShowPage(page);
+  if (page === 'ventas') cargarListaVentas();
   if (page === 'compras') cargarListaCompras();
   if (page === 'productos') cargarProductosLista();
   if (page === 'inventarios') cargarInventarios();
@@ -1310,7 +1311,6 @@ window.showPage = function(page) {
   if (page === 'planilla') cargarPlanilla();
   if (page === 'libros') { cargarLibroDiario(); mostrarLibro('diario'); }
 };
-
 
 // ══ MÓDULO PRODUCTOS ══════════════════════════════════════════════════════
 function mostrarFormProducto() {
@@ -2886,22 +2886,27 @@ function descargarArchivo(contenido, nombre, tipo) {
         </div>
       </div>
       <div class="card">
-        <div class="card-header">
-          <span class="card-title">📋 Compras registradas</span>
-          <span id="compras-count" style="font-size:0.8rem; color:#A0AEC0;">Cargando...</span>
-        </div>
-        <div class="card-body" style="padding:0; overflow-x:auto;">
-          <table class="data-table">
-            <thead>
-              <tr><th>ID</th><th>Cuenta</th><th>Fecha</th><th>N° Op.</th><th>Glosa</th><th>Debe</th><th>Haber</th><th>Saldo</th></tr>
-            </thead>
-            <tbody id="lm-tbody">
-              <tr><td colspan="8" style="text-align:center; padding:32px; color:#A0AEC0;">Cargando...</td></tr>
-            </tbody>
-          </table>
-        </div>
-        </div>
-      </div>
+  <div class="card-header">
+    <span class="card-title">📋 Compras registradas</span>
+    <span id="compras-count" style="font-size:0.8rem; color:#A0AEC0;">Cargando...</span>
+  </div>
+  <div class="card-body" style="padding:0; overflow-x:auto;">
+    <table class="data-table" id="tabla-compras">
+      <thead>
+        <tr>
+          <th>Fecha</th><th>Tipo</th><th>Número</th><th>Proveedor</th>
+          <th>Producto</th><th>Cant.</th><th>Precio</th><th>Subtotal</th>
+          <th>IGV</th><th>Total</th><th>Forma Pago</th><th>Tipo Pago</th>
+          <th>Estado Pago</th><th>Días Créd.</th><th>Vencimiento</th><th>Estado Venc.</th>
+        </tr>
+      </thead>
+      <tbody id="compras-tbody">
+        <tr><td colspan="16" style="text-align:center; padding:32px; color:#A0AEC0;">Cargando compras...</td></tr>
+      </tbody>
+    </table>
+  </div>
+  </div>
+</div>
     </div>
 
     <div class="page" id="page-inventarios">
@@ -3858,7 +3863,6 @@ function formatMonto(val) {
   return 'S/. ' + num.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
-
 // ══ MÓDULO DE VENTAS ═════════════════════════════════════════════════════
 let streamEscaner = null;
 let scannerInterval = null;
@@ -4299,7 +4303,6 @@ function buscarCliente(rucDni) {
     document.getElementById('v-nombre').style.borderColor = '';
   }
 }
-
 
 // ══ MÓDULO COMPRAS ════════════════════════════════════════════════════════
 let streamEscanerC = null;
