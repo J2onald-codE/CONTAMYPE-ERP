@@ -3685,6 +3685,8 @@ function showPage(page) {
 
   document.getElementById(`page-${page}`).classList.add('active');
   window.scrollTo(0, 0);
+  const navEl = document.querySelector('.sidebar-nav');
+  if (navEl) navEl.scrollTop = 0;
   document.getElementById('topbar-title').textContent = pageTitles[page] || page;
 
   document.querySelectorAll('.nav-item').forEach(n => {
