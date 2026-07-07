@@ -3684,6 +3684,7 @@ function showPage(page) {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
 
   document.getElementById(`page-${page}`).classList.add('active');
+  window.scrollTo(0, 0);
   document.getElementById('topbar-title').textContent = pageTitles[page] || page;
 
   document.querySelectorAll('.nav-item').forEach(n => {
@@ -5075,6 +5076,7 @@ function erFilaFinal(label, val, color) {
 const originalShowPage = showPage;
 window.showPage = function(page) {
   originalShowPage(page);
+  if (page === 'ventas') cargarListaVentas();
   if (page === 'compras') cargarListaCompras();
   if (page === 'productos') cargarProductosLista();
   if (page === 'inventarios') cargarInventarios();
