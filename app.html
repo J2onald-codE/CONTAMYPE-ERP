@@ -610,7 +610,6 @@ async function iniciarEscanerCompra() {
     }
   } catch(err) {
     detenerEscanerCompra();
-  }
 }
 
 function detenerEscanerCompra() {
@@ -3962,7 +3961,6 @@ async function iniciarEscaner() {
             document.getElementById('v-codigo-barras').value = codigo;
             const encontrado = await buscarProductoPorCodigo(codigo);
             if (encontrado) detenerEscaner();
-          }
           }
         } catch(e) {}
       }, 500);
