@@ -592,14 +592,14 @@ async function iniciarEscanerCompra() {
     if ('BarcodeDetector' in window) {
       const detector = new BarcodeDetector({ formats: ['ean_13','ean_8','code_128','code_39','qr_code'] });
       const video = document.getElementById('scanner-video-c');
-      scannerIntervalC = setInterval(async () => {
+      scannerInterval = setInterval(async () => {
         try {
           const barcodes = await detector.detect(video);
           if (barcodes.length > 0) {
             const codigo = barcodes[0].rawValue;
-            document.getElementById('c-codigo-barras').value = codigo;
-            const encontrado = await buscarProductoCompra(codigo);
-            if (encontrado) detenerEscanerCompra();
+            document.getElementById('v-codigo-barras').value = codigo;
+            const encontrado = await buscarProductoPorCodigo(codigo);
+            if (encontrado) detenerEscaner();
           }
         } catch(e) {}
       }, 500);
