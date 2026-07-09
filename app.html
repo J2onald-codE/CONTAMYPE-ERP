@@ -596,9 +596,10 @@ async function iniciarEscanerCompra() {
         try {
           const barcodes = await detector.detect(video);
           if (barcodes.length > 0) {
-            document.getElementById('c-codigo-barras').value = barcodes[0].rawValue;
-            buscarProductoCompra(barcodes[0].rawValue);
-            detenerEscanerCompra();
+            const codigo = barcodes[0].rawValue;
+            document.getElementById('c-codigo-barras').value = codigo;
+            const encontrado = await buscarProductoCompra(codigo);
+            if (encontrado) detenerEscanerCompra();
           }
         } catch(e) {}
       }, 500);
@@ -4436,7 +4437,7 @@ function buscarProveedor(ruc) {
   }
 }
 
-function buscarProductoCompra(codigo) {
+async function buscarProductoCompra(codigo) {
   if (!codigo || codigo.length < 3) return;
   const prod = productosCache.find(p => p.codigoBarras === codigo.trim() || p.codigo === codigo.trim());
   if (prod) {
