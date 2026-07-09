@@ -92,8 +92,8 @@ async function iniciarEscaner() {
           if (barcodes.length > 0) {
             const codigo = barcodes[0].rawValue;
             document.getElementById('v-codigo-barras').value = codigo;
-            buscarProductoPorCodigo(codigo);
-            detenerEscaner();
+            const encontrado = await buscarProductoPorCodigo(codigo);
+            if (encontrado) detenerEscaner();
           }
         } catch(e) {}
       }, 500);
@@ -153,8 +153,11 @@ async function cargarProductos() {
   }
 }
 
-function buscarProductoPorCodigo(codigo) {
-  if (!codigo || codigo.length < 3) return;
+async function buscarProductoPorCodigo(codigo) {
+  if (!codigo || codigo.length < 3) return false;
+  if (productosCache.length === 0) {
+    await cargarProductos();
+  }
   const prod = productosCache.find(p =>
     p.codigoBarras === codigo.trim() || p.codigo === codigo.trim()
   );
@@ -163,6 +166,10 @@ function buscarProductoPorCodigo(codigo) {
     document.getElementById('v-precio').value = prod.precio || '';
     calcularTotalesVenta();
     mostrarScanResultado('✅ Producto encontrado: ' + prod.nombre, true);
+    return true;
+  } else {
+    mostrarScanResultado('⚠️ Código no encontrado en Productos, sigue escaneando...', false);
+    return false;
   }
 }
 
@@ -3952,8 +3959,8 @@ async function iniciarEscaner() {
           if (barcodes.length > 0) {
             const codigo = barcodes[0].rawValue;
             document.getElementById('v-codigo-barras').value = codigo;
-            buscarProductoPorCodigo(codigo);
-            detenerEscaner();
+            const encontrado = await buscarProductoPorCodigo(codigo);
+            if (encontrado) detenerEscaner();
           }
         } catch(e) {}
       }, 500);
@@ -4013,8 +4020,11 @@ async function cargarProductos() {
   }
 }
 
-function buscarProductoPorCodigo(codigo) {
-  if (!codigo || codigo.length < 3) return;
+async function buscarProductoPorCodigo(codigo) {
+  if (!codigo || codigo.length < 3) return false;
+  if (productosCache.length === 0) {
+    await cargarProductos();
+  }
   const prod = productosCache.find(p =>
     p.codigoBarras === codigo.trim() || p.codigo === codigo.trim()
   );
@@ -4023,6 +4033,10 @@ function buscarProductoPorCodigo(codigo) {
     document.getElementById('v-precio').value = prod.precio || '';
     calcularTotalesVenta();
     mostrarScanResultado('✅ Producto encontrado: ' + prod.nombre, true);
+    return true;
+  } else {
+    mostrarScanResultado('⚠️ Código no encontrado en Productos, sigue escaneando...', false);
+    return false;
   }
 }
 
@@ -4444,13 +4458,14 @@ async function iniciarEscanerCompra() {
     if ('BarcodeDetector' in window) {
       const detector = new BarcodeDetector({ formats: ['ean_13','ean_8','code_128','code_39','qr_code'] });
       const video = document.getElementById('scanner-video-c');
-      scannerIntervalC = setInterval(async () => {
+      scannerInterval = setInterval(async () => {
         try {
           const barcodes = await detector.detect(video);
           if (barcodes.length > 0) {
-            document.getElementById('c-codigo-barras').value = barcodes[0].rawValue;
-            buscarProductoCompra(barcodes[0].rawValue);
-            detenerEscanerCompra();
+            const codigo = barcodes[0].rawValue;
+            document.getElementById('v-codigo-barras').value = codigo;
+            const encontrado = await buscarProductoPorCodigo(codigo);
+            if (encontrado) detenerEscaner();
           }
         } catch(e) {}
       }, 500);
