@@ -86,14 +86,14 @@ async function iniciarEscaner() {
     // Usar BarcodeDetector si está disponible (Chrome/Edge)
     if ('BarcodeDetector' in window) {
       const detector = new BarcodeDetector({ formats: ['ean_13', 'ean_8', 'code_128', 'code_39', 'qr_code'] });
-      scannerInterval = setInterval(async () => {
+      scannerIntervalC = setInterval(async () => {
         try {
           const barcodes = await detector.detect(video);
           if (barcodes.length > 0) {
             const codigo = barcodes[0].rawValue;
-            document.getElementById('v-codigo-barras').value = codigo;
-            const encontrado = await buscarProductoPorCodigo(codigo);
-            if (encontrado) detenerEscaner();
+            document.getElementById('c-codigo-barras').value = codigo;
+            const encontrado = await buscarProductoCompra(codigo);
+            if (encontrado) detenerEscanerCompra();
           }
         } catch(e) {}
       }, 500);
@@ -3963,6 +3963,7 @@ async function iniciarEscaner() {
             const encontrado = await buscarProductoPorCodigo(codigo);
             if (encontrado) detenerEscaner();
           }
+          }
         } catch(e) {}
       }, 500);
     } else {
@@ -4459,14 +4460,14 @@ async function iniciarEscanerCompra() {
     if ('BarcodeDetector' in window) {
       const detector = new BarcodeDetector({ formats: ['ean_13','ean_8','code_128','code_39','qr_code'] });
       const video = document.getElementById('scanner-video-c');
-      scannerInterval = setInterval(async () => {
+      scannerIntervalC = setInterval(async () => {
         try {
           const barcodes = await detector.detect(video);
           if (barcodes.length > 0) {
             const codigo = barcodes[0].rawValue;
-            document.getElementById('v-codigo-barras').value = codigo;
-            const encontrado = await buscarProductoPorCodigo(codigo);
-            if (encontrado) detenerEscaner();
+            document.getElementById('c-codigo-barras').value = codigo;
+            const encontrado = await buscarProductoCompra(codigo);
+            if (encontrado) detenerEscanerCompra();
           }
         } catch(e) {}
       }, 500);
