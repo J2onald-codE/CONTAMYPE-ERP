@@ -592,14 +592,16 @@ async function iniciarEscanerCompra() {
     if ('BarcodeDetector' in window) {
       const detector = new BarcodeDetector({ formats: ['ean_13','ean_8','code_128','code_39','qr_code'] });
       const video = document.getElementById('scanner-video-c');
-      scannerInterval = setInterval(async () => {
+      let yaEncontrado = false;
+      scannerIntervalC = setInterval(async () => {
+        if (yaEncontrado) return;
         try {
           const barcodes = await detector.detect(video);
           if (barcodes.length > 0) {
             const codigo = barcodes[0].rawValue;
-            document.getElementById('v-codigo-barras').value = codigo;
-            const encontrado = await buscarProductoPorCodigo(codigo);
-            if (encontrado) detenerEscaner();
+            document.getElementById('c-codigo-barras').value = codigo;
+            const encontrado = await buscarProductoCompra(codigo);
+            if (encontrado) { yaEncontrado = true; detenerEscanerCompra(); }
           }
         } catch(e) {}
       }, 500);
@@ -4458,14 +4460,16 @@ async function iniciarEscanerCompra() {
     if ('BarcodeDetector' in window) {
       const detector = new BarcodeDetector({ formats: ['ean_13','ean_8','code_128','code_39','qr_code'] });
       const video = document.getElementById('scanner-video-c');
+      let yaEncontrado = false;
       scannerIntervalC = setInterval(async () => {
+        if (yaEncontrado) return;
         try {
           const barcodes = await detector.detect(video);
           if (barcodes.length > 0) {
             const codigo = barcodes[0].rawValue;
             document.getElementById('c-codigo-barras').value = codigo;
             const encontrado = await buscarProductoCompra(codigo);
-            if (encontrado) detenerEscanerCompra();
+            if (encontrado) { yaEncontrado = true; detenerEscanerCompra(); }
           }
         } catch(e) {}
       }, 500);
