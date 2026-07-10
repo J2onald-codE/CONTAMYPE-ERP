@@ -570,20 +570,22 @@ function buscarProveedor(ruc) {
   }
 }
 
-async function buscarProductoCompra(codigo) {
+async function buscarProductoPorCodigo(codigo) {
   if (!codigo || codigo.length < 3) return false;
   if (productosCache.length === 0) {
     await cargarProductos();
   }
-  const prod = productosCache.find(p => p.codigoBarras === codigo.trim() || p.codigo === codigo.trim());
+  const prod = productosCache.find(p =>
+    p.codigoBarras === codigo.trim() || p.codigo === codigo.trim()
+  );
   if (prod) {
-    document.getElementById('c-producto').value = prod.nombre;
-    const el = document.getElementById('scan-resultado-c');
-    if (el) { el.style.display='block'; el.style.color='var(--verde)'; el.textContent='✅ Producto: ' + prod.nombre; }
+    document.getElementById('v-producto').value = prod.nombre;
+    document.getElementById('v-precio').value = prod.precio || '';
+    calcularTotalesVenta();
+    mostrarScanResultado('✅ Producto encontrado: ' + prod.nombre, true);
     return true;
   } else {
-    const el = document.getElementById('scan-resultado-c');
-    if (el) { el.style.display='block'; el.style.color='var(--rojo)'; el.textContent='⚠️ Código no encontrado, sigue escaneando...'; }
+    mostrarScanResultado('⚠️ Código no encontrado en Productos, sigue escaneando...', false);
     return false;
   }
 }
@@ -4445,20 +4447,22 @@ function buscarProveedor(ruc) {
   }
 }
 
-async function buscarProductoCompra(codigo) {
+async function buscarProductoPorCodigo(codigo) {
   if (!codigo || codigo.length < 3) return false;
   if (productosCache.length === 0) {
     await cargarProductos();
   }
-  const prod = productosCache.find(p => p.codigoBarras === codigo.trim() || p.codigo === codigo.trim());
+  const prod = productosCache.find(p =>
+    p.codigoBarras === codigo.trim() || p.codigo === codigo.trim()
+  );
   if (prod) {
-    document.getElementById('c-producto').value = prod.nombre;
-    const el = document.getElementById('scan-resultado-c');
-    if (el) { el.style.display='block'; el.style.color='var(--verde)'; el.textContent='✅ Producto: ' + prod.nombre; }
+    document.getElementById('v-producto').value = prod.nombre;
+    document.getElementById('v-precio').value = prod.precio || '';
+    calcularTotalesVenta();
+    mostrarScanResultado('✅ Producto encontrado: ' + prod.nombre, true);
     return true;
   } else {
-    const el = document.getElementById('scan-resultado-c');
-    if (el) { el.style.display='block'; el.style.color='var(--rojo)'; el.textContent='⚠️ Código no encontrado, sigue escaneando...'; }
+    mostrarScanResultado('⚠️ Código no encontrado en Productos, sigue escaneando...', false);
     return false;
   }
 }
