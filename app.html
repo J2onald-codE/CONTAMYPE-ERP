@@ -4439,13 +4439,20 @@ function buscarProveedor(ruc) {
 }
 
 async function buscarProductoCompra(codigo) {
-  if (!codigo || codigo.length < 3) return;
+  if (!codigo || codigo.length < 3) return false;
+  if (productosCache.length === 0) {
+    await cargarProductos();
+  }
   const prod = productosCache.find(p => p.codigoBarras === codigo.trim() || p.codigo === codigo.trim());
   if (prod) {
     document.getElementById('c-producto').value = prod.nombre;
-    document.getElementById('c-scan-resultado') && (document.getElementById('scan-resultado-c').style.display = 'block');
     const el = document.getElementById('scan-resultado-c');
-    if (el) { el.style.display='block'; el.textContent='✅ Producto: ' + prod.nombre; }
+    if (el) { el.style.display='block'; el.style.color='var(--verde)'; el.textContent='✅ Producto: ' + prod.nombre; }
+    return true;
+  } else {
+    const el = document.getElementById('scan-resultado-c');
+    if (el) { el.style.display='block'; el.style.color='var(--rojo)'; el.textContent='⚠️ Código no encontrado, sigue escaneando...'; }
+    return false;
   }
 }
 
