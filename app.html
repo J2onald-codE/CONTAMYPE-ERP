@@ -17,6 +17,7 @@ function mostrarFormVenta() {
   const hoy = new Date().toISOString().split('T')[0];
   document.getElementById('v-fecha').value = hoy;
   document.getElementById('v-estado-cobro').value = 'PENDIENTE';
+  toggleCreditoVenta();
   cargarProductos();
   cargarClientes();
   cargarListaVentas();
@@ -465,6 +466,7 @@ function mostrarFormCompra() {
   const hoy = new Date().toISOString().split('T')[0];
   document.getElementById('c-fecha').value = hoy;
   document.getElementById('c-estado-pago').value = 'PAGADO';
+  toggleCreditoCompra();
   cargarProveedores();
   cargarListaCompras();
 }
@@ -3893,6 +3895,7 @@ function mostrarFormVenta() {
   const hoy = new Date().toISOString().split('T')[0];
   document.getElementById('v-fecha').value = hoy;
   document.getElementById('v-estado-cobro').value = 'PENDIENTE';
+  toggleCreditoVenta();
   cargarProductos();
   cargarClientes();
   cargarListaVentas();
@@ -4340,6 +4343,7 @@ function mostrarFormCompra() {
   const hoy = new Date().toISOString().split('T')[0];
   document.getElementById('c-fecha').value = hoy;
   document.getElementById('c-estado-pago').value = 'PAGADO';
+  toggleCreditoCompra();
   cargarProveedores();
   cargarListaCompras();
 }
