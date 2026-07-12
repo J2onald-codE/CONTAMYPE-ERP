@@ -881,12 +881,15 @@ async function cargarCXP() {
         <td>${row[2]||'-'}</td><td>${row[4]||'-'}</td><td>${row[5]||'-'}</td><td>${row[7]||'-'}</td>
         <td><b>S/. ${parseFloat(row[12]||0).toFixed(2)}</b></td>
         <td>${row[23]||'-'}</td><td>${row[24]||'-'}</td><td>${badgeVenc}</td>
+        <td><button class="btn-action btn-secondary-action" style="padding:4px 10px; font-size:0.75rem;" onclick="marcarCompraPagada('${row[0]}')">💰 Marcar pagado</button></td>
       </tr>`;
     }).join('');
   } catch(err) {
-    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:32px; color:var(--rojo);">Error al cargar.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:32px; color:var(--rojo);">Error al cargar.</td></tr>';
   }
 }
+
+// ══ CXC - CUENTAS POR COBRAR
 
 // ══ CXC - CUENTAS POR COBRAR ══════════════════════════════════════════════
 async function cargarCXC() {
@@ -913,12 +916,15 @@ async function cargarCXC() {
         <td>${row[2]||'-'}</td><td>${row[5]||'-'}</td><td>${row[6]||'-'}</td><td>${row[8]||'-'}</td>
         <td><b>S/. ${parseFloat(row[13]||0).toFixed(2)}</b></td>
         <td>${row[23]||'-'}</td><td>${row[24]||'-'}</td><td>${badgeVenc}</td>
+        <td><button class="btn-action btn-secondary-action" style="padding:4px 10px; font-size:0.75rem;" onclick="marcarVentaCobrada('${row[0]}')">💰 Marcar cobrado</button></td>
       </tr>`;
     }).join('');
   } catch(err) {
-    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:32px; color:var(--rojo);">Error al cargar.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:32px; color:var(--rojo);">Error al cargar.</td></tr>';
   }
 }
+
+// ══ PLANILLA
 
 // ══ PLANILLA ══════════════════════════════════════════════════════════════
 function mostrarFormPlanilla() {
@@ -3396,11 +3402,11 @@ function descargarArchivo(contenido, nombre, tipo) {
             <thead>
               <tr>
                 <th>Fecha</th><th>Comprobante</th><th>Proveedor</th><th>Producto</th>
-                <th>Total</th><th>Días Créd.</th><th>Vencimiento</th><th>Estado</th>
+                <th>Total</th><th>Días Créd.</th><th>Vencimiento</th><th>Estado</th><th>Acción</th>
               </tr>
             </thead>
             <tbody id="cxp-tbody">
-              <tr><td colspan="8" style="text-align:center; padding:32px; color:#A0AEC0;">Cargando...</td></tr>
+              <tr><td colspan="9" style="text-align:center; padding:32px; color:#A0AEC0;">Cargando...</td></tr>
             </tbody>
           </table>
         </div>
@@ -3607,6 +3613,8 @@ const CORREOS_AUTORIZADOS = [
 // Formato: https://docs.google.com/spreadsheets/d/ESTE_ES_EL_ID/edit
 const SHEET_ID = '1mab4WBaUtmgki6ddZkXo4kt6TNiB1e6OW-cIUoWDCrI';
 const API_KEY = 'AIzaSyAYnvAKY0oPdfciD-AC5TCvtaSn9bFWpjE'; // Opcional para lectura pública
+const WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbwdMcLA_Mhr5a2BvnRGSHKWM14-5dy7JWwMcuAYbWxD0YyHOL6Y34ZQYstH4uNdT4dJTg/exec';
+const WEBHOOK_TOKEN = 'PEGA_AQUI_TU_TOKEN'; // El mismo que pusiste en Propiedades del script
 
 // ══ LOGIN ════════════════════════════════════════════════════════════════
 let userInfo = null;
@@ -4795,6 +4803,40 @@ async function cargarCXC() {
     }).join('');
   } catch(err) {
     tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:32px; color:var(--rojo);">Error al cargar.</td></tr>';
+  }
+}
+
+async function marcarCompraPagada(idCompra) {
+  if (!confirm('¿Confirmas que esta compra ya fue pagada?')) return;
+  try {
+    const url = `${WEBHOOK_URL}?token=${WEBHOOK_TOKEN}&accion=pagoCompraCredito&idCompra=${encodeURIComponent(idCompra)}`;
+    const resp = await fetch(url);
+    const data = await resp.json();
+    if (data.status === 'ok') {
+      alert('✅ Pago registrado correctamente.');
+      cargarCXP();
+    } else {
+      alert('⚠️ ' + (data.message || 'No se pudo registrar el pago.'));
+    }
+  } catch (err) {
+    alert('❌ Error de conexión al registrar el pago.');
+  }
+}
+
+async function marcarVentaCobrada(idVenta) {
+  if (!confirm('¿Confirmas que esta venta ya fue cobrada?')) return;
+  try {
+    const url = `${WEBHOOK_URL}?token=${WEBHOOK_TOKEN}&accion=cobroVentaCredito&idVenta=${encodeURIComponent(idVenta)}`;
+    const resp = await fetch(url);
+    const data = await resp.json();
+    if (data.status === 'ok') {
+      alert('✅ Cobro registrado correctamente.');
+      cargarCXC();
+    } else {
+      alert('⚠️ ' + (data.message || 'No se pudo registrar el cobro.'));
+    }
+  } catch (err) {
+    alert('❌ Error de conexión al registrar el cobro.');
   }
 }
 
