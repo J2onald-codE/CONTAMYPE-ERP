@@ -3431,7 +3431,7 @@ function descargarArchivo(contenido, nombre, tipo) {
             <thead>
               <tr>
                 <th>Fecha</th><th>Comprobante</th><th>Cliente</th><th>Producto</th>
-                <th>Total</th><th>Días Créd.</th><th>Vencimiento</th><th>Estado</th>
+                <th>Total</th><th>Días Créd.</th><th>Vencimiento</th><th>Estado</th><th>Acción</th>
               </tr>
             </thead>
             <tbody id="cxc-tbody">
@@ -3614,7 +3614,7 @@ const CORREOS_AUTORIZADOS = [
 const SHEET_ID = '1mab4WBaUtmgki6ddZkXo4kt6TNiB1e6OW-cIUoWDCrI';
 const API_KEY = 'AIzaSyAYnvAKY0oPdfciD-AC5TCvtaSn9bFWpjE'; // Opcional para lectura pública
 const WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbwdMcLA_Mhr5a2BvnRGSHKWM14-5dy7JWwMcuAYbWxD0YyHOL6Y34ZQYstH4uNdT4dJTg/exec';
-const WEBHOOK_TOKEN = 'PEGA_AQUI_TU_TOKEN'; // El mismo que pusiste en Propiedades del script
+const WEBHOOK_TOKEN = 'contamype2026_x2Kp6mQzL0wRtN';
 
 // ══ LOGIN ════════════════════════════════════════════════════════════════
 let userInfo = null;
@@ -4767,10 +4767,11 @@ async function cargarCXP() {
         <td>${row[2]||'-'}</td><td>${row[4]||'-'}</td><td>${row[5]||'-'}</td><td>${row[7]||'-'}</td>
         <td><b>S/. ${parseFloat(row[12]||0).toFixed(2)}</b></td>
         <td>${row[23]||'-'}</td><td>${row[24]||'-'}</td><td>${badgeVenc}</td>
+        <td><button class="btn-action btn-secondary-action" style="padding:4px 10px; font-size:0.75rem;" onclick="marcarCompraPagada('${row[0]}')">💰 Marcar pagado</button></td>
       </tr>`;
     }).join('');
   } catch(err) {
-    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:32px; color:var(--rojo);">Error al cargar.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:32px; color:var(--rojo);">Error al cargar.</td></tr>';
   }
 }
 
@@ -4799,10 +4800,11 @@ async function cargarCXC() {
         <td>${row[2]||'-'}</td><td>${row[5]||'-'}</td><td>${row[6]||'-'}</td><td>${row[8]||'-'}</td>
         <td><b>S/. ${parseFloat(row[13]||0).toFixed(2)}</b></td>
         <td>${row[23]||'-'}</td><td>${row[24]||'-'}</td><td>${badgeVenc}</td>
+        <td><button class="btn-action btn-secondary-action" style="padding:4px 10px; font-size:0.75rem;" onclick="marcarVentaCobrada('${row[0]}')">💰 Marcar cobrado</button></td>
       </tr>`;
     }).join('');
   } catch(err) {
-    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:32px; color:var(--rojo);">Error al cargar.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:32px; color:var(--rojo);">Error al cargar.</td></tr>';
   }
 }
 
