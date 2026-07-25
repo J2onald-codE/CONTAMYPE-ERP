@@ -6,11 +6,9 @@ async function cargarCXP() {
   if (!tbody) return;
   tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:24px;"><div class="loading"><div class="spinner"></div> Cargando...</div></td></tr>';
   try {
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/REGISTRO%20DE%20COMPRAS!A2:Z500?key=${API_KEY}`;
-    const resp = await fetch(url);
-    const data = await resp.json();
-    if (!data.values) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:32px; color:#A0AEC0;">Sin datos.</td></tr>'; return; }
-    const pendientes = data.values.filter(row => (row[21]||'').trim().toUpperCase() === 'CREDITO' && (row[22]||'').trim().toUpperCase() !== 'PAGADO');
+    const rows = await obtenerDatosProtegidos('obtenerCompras');
+    if (!rows || rows.length === 0) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:32px; color:#A0AEC0;">Sin datos.</td></tr>'; return; }
+    const pendientes = rows.filter(row => (row[21]||'').trim().toUpperCase() === 'CREDITO' && (row[22]||'').trim().toUpperCase() !== 'PAGADO');
     if (count) count.textContent = pendientes.length + ' pendiente(s)';
     if (pendientes.length === 0) {
       tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:32px; color:var(--verde);">✅ Sin cuentas por pagar pendientes.</td></tr>'; return;
@@ -41,11 +39,9 @@ async function cargarCXC() {
   if (!tbody) return;
   tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:24px;"><div class="loading"><div class="spinner"></div> Cargando...</div></td></tr>';
   try {
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/REGISTRO%20DE%20VENTAS!A2:Z500?key=${API_KEY}`;
-    const resp = await fetch(url);
-    const data = await resp.json();
-    if (!data.values) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:32px; color:#A0AEC0;">Sin datos.</td></tr>'; return; }
-    const pendientes = data.values.filter(row => (row[21]||'').trim().toUpperCase() === 'CREDITO' && (row[22]||'').trim().toUpperCase() !== 'COBRADO');
+    const rows = await obtenerDatosProtegidos('obtenerVentas');
+    if (!rows || rows.length === 0) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:32px; color:#A0AEC0;">Sin datos.</td></tr>'; return; }
+    const pendientes = rows.filter(row => (row[21]||'').trim().toUpperCase() === 'CREDITO' && (row[22]||'').trim().toUpperCase() !== 'COBRADO');
     if (count) count.textContent = pendientes.length + ' pendiente(s)';
     if (pendientes.length === 0) {
       tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:32px; color:var(--verde);">✅ Sin cuentas por cobrar pendientes.</td></tr>'; return;
