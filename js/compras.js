@@ -65,13 +65,11 @@ async function generarNumeroComprobanteCompra() {
   const campo = document.getElementById('c-numero');
   campo.value = 'Generando...';
   try {
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/REGISTRO%20DE%20COMPRAS!E2:E500?key=${API_KEY}`;
-    const resp = await fetch(url);
-    const data = await resp.json();
+    const rows = await obtenerDatosProtegidos('obtenerCompras');
     let maxCorr = 0;
-    if (data.values) {
-      data.values.forEach(row => {
-        const num = (row[0] || '').toString();
+    if (rows) {
+      rows.forEach(row => {
+        const num = (row[4] || '').toString();
         if (num.startsWith(serie)) {
           const partes = num.split('-');
           if (partes.length === 2) {
@@ -90,11 +88,9 @@ async function generarNumeroComprobanteCompra() {
 async function cargarProveedores() {
   if (proveedoresCache.length > 0) return;
   try {
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/PROVEEDORES!A2:G500?key=${API_KEY}`;
-    const resp = await fetch(url);
-    const data = await resp.json();
-    if (data.values) {
-      proveedoresCache = data.values.map(row => ({
+    const rows = await obtenerDatosProtegidos('obtenerProveedores');
+    if (rows) {
+      proveedoresCache = rows.map(row => ({
         codigo: (row[0]||'').toString().trim(),
         nombre: (row[1]||'').toString().trim(),
         ruc: (row[2]||'').toString().trim()
