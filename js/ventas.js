@@ -356,14 +356,12 @@ async function generarNumeroComprobante() {
   campoNumero.value = 'Generando...';
 
   try {
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/REGISTRO%20DE%20VENTAS!F2:F500?key=${API_KEY}`;
-    const resp = await fetch(url);
-    const data = await resp.json();
+    const rows = await obtenerDatosProtegidos('obtenerVentas');
 
     let maxCorr = 0;
-    if (data.values) {
-      data.values.forEach(row => {
-        const num = (row[0] || '').toString();
+    if (rows) {
+      rows.forEach(row => {
+        const num = (row[5] || '').toString();
         if (num.startsWith(serie)) {
           const partes = num.split('-');
           if (partes.length === 2) {
@@ -391,11 +389,9 @@ let clientesCache = [];
 async function cargarClientes() {
   if (clientesCache.length > 0) return;
   try {
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/CLIENTES!A2:D500?key=${API_KEY}`;
-    const resp = await fetch(url);
-    const data = await resp.json();
-    if (data.values) {
-      clientesCache = data.values.map(row => ({
+    const rows = await obtenerDatosProtegidos('obtenerClientes');
+    if (rows) {
+      clientesCache = rows.map(row => ({
         codigo: (row[0] || '').toString().trim(),
         nombre: (row[1] || '').toString().trim(),
         ruc: (row[2] || '').toString().trim(),
