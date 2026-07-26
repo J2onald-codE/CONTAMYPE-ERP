@@ -4,8 +4,6 @@ const CLIENT_ID = '407598104224-tmtf4aeekucpi91o6md0f5gpnvhorvn6.apps.googleuser
 
 const SHEET_ID = '1mab4WBaUtmgki6ddZkXo4kt6TNiB1e6OW-cIUoWDCrI';
 
-const API_KEY = 'AIzaSyAYnvAKY0oPdfciD-AC5TCvtaSn9bFWpjE';
-
 const WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbwdMcLA_Mhr5a2BvnRGSHKWM14-5dy7JWwMcuAYbWxD0YyHOL6Y34ZQYstH4uNdT4dJTg/exec';
 
 const WEBHOOK_TOKEN = 'contamype2026_x2Kp6mQzL0wRtN';
@@ -25,22 +23,15 @@ const PERMISOS_POR_ROL = {
 
 let rolActual = null;
 
-async function obtenerUsuarioAutorizado(email) {
-  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${HOJA_USUARIOS}!A2:D200?key=${API_KEY}`;
-  const resp = await fetch(url);
-  if (!resp.ok) throw new Error('No se pudo consultar la hoja de usuarios (' + resp.status + ')');
-  const data = await resp.json();
-  const filas = data.values || [];
-  for (const fila of filas) {
-    const [correo, nombre, rol, activo] = fila;
-    if (correo && correo.trim().toLowerCase() === email.trim().toLowerCase()) {
-      if ((activo || '').trim().toUpperCase() !== 'SI') return null;
-      const rolLimpio = (rol || '').trim().toUpperCase();
-      if (!PERMISOS_POR_ROL[rolLimpio]) return null; // rol no reconocido
-      return { rol: rolLimpio, nombre: nombre || '' };
-    }
-  }
-  return null;
+async function obtenerUsuarioAutorizado(accessToken) {
+  const data = await llamarWebhookJSONP({
+    token: WEBHOOK_TOKEN,
+    accion: 'obtenerMiRol',
+    accessToken: accessToken
+  });
+  if (data.status !== 'ok') return null;
+  if (!PERMISOS_POR_ROL[data.rol]) return null; // rol no reconocido
+  return { rol: data.rol, nombre: data.nombre || '' };
 }
 
 function aplicarPermisosDeRol(rol) {
@@ -81,13 +72,14 @@ function iniciarLoginGoogle() {
         mostrarError('Error al iniciar sesión. Intenta nuevamente.');
         return;
       }
+      currentAccessToken = response.access_token;
       // Obtener info del usuario
       fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
         headers: { Authorization: `Bearer ${response.access_token}` }
       })
       .then(r => r.json())
       .then(user => {
-        obtenerUsuarioAutorizado(user.email)
+        obtenerUsuarioAutorizado(response.access_token)
           .then(autorizado => {
             if (!autorizado) {
               mostrarError(`El correo ${user.email} no tiene acceso autorizado.`);
