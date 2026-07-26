@@ -133,17 +133,15 @@ async function cargarKardex(codigo) {
   tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding:24px;"><div class="loading"><div class="spinner"></div> Cargando...</div></td></tr>';
 
   try {
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/KARDEX!A2:N500?key=${API_KEY}`;
-    const resp = await fetch(url);
-    const data = await resp.json();
+    const datosKardex = await obtenerDatosProtegidos('obtenerKardex');
 
-    if (!data.values) {
+    if (!datosKardex) {
       tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding:32px; color:#A0AEC0;">Sin movimientos en Kardex.</td></tr>';
       return;
     }
 
     // Filtrar por código de producto
-    kardexData = data.values.filter(row => (row[2]||'').toString().trim() === codigo.toString().trim());
+    kardexData = datosKardex.filter(row => (row[2]||'').toString().trim() === codigo.toString().trim());
 
     if (kardexData.length === 0) {
       tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding:32px; color:#A0AEC0;">Sin movimientos para este producto.</td></tr>';
@@ -224,12 +222,10 @@ async function cargarSelectorProductos() {
   const select = document.getElementById('ajuste-producto');
   select.innerHTML = '<option value="">Cargando productos...</option>';
   try {
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/INVENTARIOS!A2:J500?key=${API_KEY}`;
-    const resp = await fetch(url);
-    const data = await resp.json();
-    if (data.values) {
+    const rows = await obtenerDatosProtegidos('obtenerInventarios');
+    if (rows) {
       select.innerHTML = '<option value="">Seleccionar producto...</option>' +
-        data.values.map(row => `<option value="${row[1]||''}" data-stock="${row[7]||0}" data-costo="${row[8]||0}">${row[2]||row[1]||'-'} (Stock: ${parseFloat(row[7]||0).toFixed(0)})</option>`).join('');
+        rows.map(row => `<option value="${row[1]||''}" data-stock="${row[7]||0}" data-costo="${row[8]||0}">${row[2]||row[1]||'-'} (Stock: ${parseFloat(row[7]||0).toFixed(0)})</option>`).join('');
     }
   } catch(e) {
     select.innerHTML = '<option value="">Error al cargar</option>';
@@ -324,13 +320,11 @@ async function cargarConteoFisico() {
   const tbody = document.getElementById('conteo-tbody');
   tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:24px;"><div class="loading"><div class="spinner"></div> Cargando...</div></td></tr>';
   try {
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/INVENTARIOS!A2:J500?key=${API_KEY}`;
-    const resp = await fetch(url);
-    const data = await resp.json();
-    if (!data.values || data.values.length === 0) {
+    const rows = await obtenerDatosProtegidos('obtenerInventarios');
+    if (!rows || rows.length === 0) {
       tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:32px; color:#A0AEC0;">Sin productos en inventario.</td></tr>'; return;
     }
-    tbody.innerHTML = data.values.map((row, i) => `<tr>
+    tbody.innerHTML = rows.map((row, i) => `<tr>
       <td><b>${row[2]||row[1]||'-'}</b><br><span style="font-size:0.72rem; color:#A0AEC0;">${row[1]||''}</span></td>
       <td style="font-weight:700; color:var(--azul-oscuro);">${parseFloat(row[7]||0).toFixed(0)}</td>
       <td><input type="number" id="conteo-${i}" class="form-input" min="0" step="1" placeholder="0" data-codigo="${row[1]||''}" data-sistema="${row[7]||0}" oninput="calcularDiferencia(${i})" style="width:100px;"></td>
