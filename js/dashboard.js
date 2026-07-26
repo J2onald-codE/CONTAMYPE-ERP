@@ -31,20 +31,8 @@ async function cargarDashboard() {
 }
 
 async function leerDashboardDesdeSheets() {
-  const base = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values`;
-  const key = `?key=${API_KEY}`;
-
-  // Leer hoja DASHBOARD fila 2
-  const [dashResp, tesoreriaResp, comprasResp, ventasResp, planillaResp] = await Promise.all([
-    fetch(`${base}/DASHBOARD!A2:K2${key}`),
-    fetch(`${base}/TESORERIA!A1:K1${key}`),
-    fetch(`${base}/REGISTRO%20DE%20COMPRAS!A1:T1${key}`),
-    fetch(`${base}/REGISTRO%20DE%20VENTAS!A1:T1${key}`),
-    fetch(`${base}/PLANILLA!A1:Z1${key}`)
-  ]);
-
-  const dashData = await dashResp.json();
-  const row = dashData.values ? dashData.values[0] : [];
+  const rows = await obtenerDatosProtegidos('obtenerDashboard');
+  const row = (rows && rows.length > 0) ? rows[0] : [];
 
   // Columnas DASHBOARD:
   // A=SALDO TES, B=CXC, C=CXP, D=VENTAS MES, E=COMPRAS MES,
