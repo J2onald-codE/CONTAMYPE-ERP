@@ -170,7 +170,7 @@ async function guardarVenta() {
       fecha, // C
       document.getElementById('v-fecha-venc').value, // D
       tipoComp, // E
-      document.getElementById('v-numero').value, // F
+      '', // F - Número (Apps Script lo asigna con candado, evita duplicados si dos ventas se guardan casi al mismo tiempo)
       nombre, // G
       document.getElementById('v-ruc').value, // H
       producto, // I
