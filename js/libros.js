@@ -18,14 +18,11 @@ async function cargarLibroDiario() {
   if (!tbody) return;
   tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:24px;"><div class="loading"><div class="spinner"></div> Cargando...</div></td></tr>';
   try {
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/LIBRO%20DIARIO%205.1!A2:I500?key=${API_KEY}`;
-    const resp = await fetch(url);
-    const data = await resp.json();
-    if (!data.values || data.values.length === 0) {
+    const rows = await obtenerDatosProtegidos('obtenerLibroDiario');
+    if (!rows || rows.length === 0) {
       tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:32px; color:#A0AEC0;">Sin asientos registrados.</td></tr>';
       if (count) count.textContent = '0 asientos'; return;
     }
-    const rows = data.values;
     if (count) count.textContent = rows.length + ' línea(s)';
     tbody.innerHTML = rows.map(row => `<tr>
       <td>${row[0]||'-'}</td><td>${row[1]||'-'}</td><td>${row[2]||'-'}</td>
@@ -44,14 +41,11 @@ async function cargarLibroMayor() {
   if (!container) return;
   container.innerHTML = '<div class="loading"><div class="spinner"></div> Cargando...</div>';
   try {
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/LIBRO%20MAYOR!A2:H500?key=${API_KEY}`;
-    const resp = await fetch(url);
-    const data = await resp.json();
-    if (!data.values || data.values.length === 0) {
+    const rows = await obtenerDatosProtegidos('obtenerLibroMayor');
+    if (!rows || rows.length === 0) {
       container.innerHTML = '<p style="text-align:center; color:#A0AEC0; padding:32px;">Sin registros en Libro Mayor.</p>';
       if (count) count.textContent = '0 línea(s)'; return;
     }
-    const rows = data.values;
     if (count) count.textContent = rows.length + ' línea(s)';
     const cuentas = {};
     rows.forEach(row => {
@@ -137,13 +131,11 @@ async function cargarEstadoResultados() {
   if (!body) return;
   body.innerHTML = '<div class="loading"><div class="spinner"></div> Cargando...</div>';
   try {
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/ESTADOS%20RESULTADOS!A2:T2?key=${API_KEY}`;
-    const resp = await fetch(url);
-    const data = await resp.json();
-    if (!data.values || data.values.length === 0) {
+    const rows = await obtenerDatosProtegidos('obtenerEstadoResultados');
+    if (!rows || rows.length === 0) {
       body.innerHTML = '<div class="empty-state"><div class="empty-icon">📊</div><p>Sin datos de Estado de Resultados.</p></div>'; return;
     }
-    const row = data.values[0];
+    const row = rows[0];
     const p = (i) => parseFloat(row[i]||0).toFixed(2);
     const color = (i) => parseFloat(row[i]||0) >= 0 ? 'var(--verde)' : 'var(--rojo)';
     const participacion = parseFloat(row[18]||0); // S = participación trabajadores
